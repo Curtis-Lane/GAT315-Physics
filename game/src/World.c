@@ -2,28 +2,31 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
-Body* bodies = NULL;
-int bodyCount = 0;
+ncBody* ncBodies = NULL;
+int ncBodyCount = 0;
 
-Body* CreateBody() {
-	Body* body = (Body*) malloc(sizeof(Body));
+ncBody* CreateBody() {
+	ncBody* body = (ncBody*) malloc(sizeof(ncBody));
 	assert(body != NULL);
 
+	memset(body, 0, sizeof(ncBody));
+
 	body->prev = NULL;
-	body->next = bodies;
+	body->next = ncBodies;
 
-	if(bodyCount != 0) {
-		bodies[0].prev = body;
+	if(ncBodyCount != 0) {
+		ncBodies[0].prev = body;
 	}
-	bodyCount += 1;
+	ncBodyCount += 1;
 
-	bodies = body;
+	ncBodies = body;
 
 	return body;
 }
 
-void DestroyBody(Body* body) {
+void DestroyBody(ncBody* body) {
 	assert(body != NULL);
 
 	if(body->prev != NULL) {
@@ -33,18 +36,18 @@ void DestroyBody(Body* body) {
 		(body->next)->prev = body->prev;
 	}
 
-	if(body == bodies) {
-		bodies = body->next;
+	if(body == ncBodies) {
+		ncBodies = body->next;
 	}
-	bodyCount -= 1;
+	ncBodyCount -= 1;
 
 	free(body);
 }
 
 void DestroyAllBodies() {
-	Body* body = bodies;
-	Body* currentBody = NULL;
-	for(int i = 0; i < bodyCount; i++) {
+	ncBody* body = ncBodies;
+	ncBody* currentBody = NULL;
+	for(int i = 0; i < ncBodyCount; i++) {
 		currentBody = body->next;
 		DestroyBody(body);
 		body = currentBody;

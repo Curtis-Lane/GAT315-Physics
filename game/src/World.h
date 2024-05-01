@@ -2,9 +2,9 @@
 
 #include "body.h"
 
-extern Body* bodies;
-extern int bodyCount;
+extern ncBody* ncBodies;
+extern int ncBodyCount;
 
-extern Body* CreateBody();
-extern void DestroyBody(Body* body);
+extern ncBody* CreateBody();
+extern void DestroyBody(ncBody* body);
 extern void DestroyAllBodies();

@@ -7,6 +7,7 @@
 #include "body.h"
 #include "mathf.h"
 #include "world.h"
+#include "integrator.h"
 
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
@@ -24,9 +25,31 @@ int main(void) {
 
 		Vector2 mousePosition = GetMousePosition();
 		if(IsMouseButtonDown(0)) {
-			Body* body = CreateBody();
+			ncBody* body = CreateBody();
 			body->position = mousePosition;
-			body->velocity = CreateVector2(GetRandomFloatValue(-5.0f, 5.0f), GetRandomFloatValue(-5.0f, 5.0f));
+			body->mass = GetRandomFloatValue(1.0f, 5.0f);
+			//ApplyForce(body, CreateVector2(GetRandomFloatValue(-50.0f, 50.0f), GetRandomFloatValue(-50.0f, 50.0f)));
+		}
+
+		// Apply force
+		{
+			ncBody* body = ncBodies;
+			while(body != NULL) {
+				ApplyForce(body, CreateVector2(0, -50));
+				
+				body = body->next;
+			}
+		}
+
+		// Update bodies
+		{
+			ncBody* body = ncBodies;
+			while(body != NULL) {
+				ExplicitEuler(body, deltaTime);
+				ClearForce(body);
+
+				body = body->next;
+			}
 		}
 
 		// Render
@@ -39,11 +62,11 @@ int main(void) {
 
 		DrawCircle((int) mousePosition.x, (int) mousePosition.y, 15, YELLOW);
 
+		// Render bodies
 		{
-			Body* body = bodies;
-			for(int i = 0; i < bodyCount; i++) {
-				body->position = Vector2Add(body->position, body->velocity);
-				DrawCircle((int) body->position.x, (int) body->position.y, 15, RED);
+			ncBody* body = ncBodies;
+			while(body != NULL) {
+				DrawCircle((int) body->position.x, (int) body->position.y, body->mass, RED);
 
 				body = body->next;
 			}
