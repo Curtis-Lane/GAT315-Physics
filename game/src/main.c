@@ -12,8 +12,6 @@
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
-//#define MAX_BODIES 100
-
 int main(void) {
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Physics Engine");
 	SetTargetFPS(60);
@@ -32,24 +30,14 @@ int main(void) {
 		}
 
 		// Apply force
-		{
-			ncBody* body = ncBodies;
-			while(body != NULL) {
-				ApplyForce(body, CreateVector2(0, -50));
-				
-				body = body->next;
-			}
+		for(ncBody* body = ncBodies; body != NULL; body = body->next) {
+			ApplyForce(body, CreateVector2(0, -50));
 		}
 
 		// Update bodies
-		{
-			ncBody* body = ncBodies;
-			while(body != NULL) {
-				ExplicitEuler(body, deltaTime);
-				ClearForce(body);
-
-				body = body->next;
-			}
+		for(ncBody* body = ncBodies; body != NULL; body = body->next) {
+			ExplicitEuler(body, deltaTime);
+			ClearForce(body);
 		}
 
 		// Render
@@ -63,13 +51,8 @@ int main(void) {
 		DrawCircle((int) mousePosition.x, (int) mousePosition.y, 15, YELLOW);
 
 		// Render bodies
-		{
-			ncBody* body = ncBodies;
-			while(body != NULL) {
-				DrawCircle((int) body->position.x, (int) body->position.y, body->mass, RED);
-
-				body = body->next;
-			}
+		for(ncBody* body = ncBodies; body != NULL; body = body->next) {
+			DrawCircle((int)body->position.x, (int)body->position.y, body->mass, RED);
 		}
 
 		EndDrawing();
