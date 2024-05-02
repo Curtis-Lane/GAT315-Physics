@@ -16,6 +16,9 @@ int main(void) {
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Physics Engine");
 	SetTargetFPS(60);
 
+	// Initialize world
+	ncGravity = CreateVector2(0, 30);
+
 	while(!WindowShouldClose()) {
 		// Update
 		float deltaTime = GetFrameTime();
@@ -26,18 +29,21 @@ int main(void) {
 			ncBody* body = CreateBody();
 			body->position = mousePosition;
 			body->mass = GetRandomFloatValue(1.0f, 5.0f);
-			//ApplyForce(body, CreateVector2(GetRandomFloatValue(-50.0f, 50.0f), GetRandomFloatValue(-50.0f, 50.0f)));
+			body->inverseMass = 1 / body->mass;
+			body->bodyType = BT_Dynamic;
+			body->damping = 0.5f;
+			body->gravityScale = 6.0f;
+			ApplyForce(body, CreateVector2(GetRandomFloatValue(-150.0f, 150.0f), GetRandomFloatValue(-150.0f, 150.0f)), FM_Velocity);
 		}
 
 		// Apply force
-		for(ncBody* body = ncBodies; body != NULL; body = body->next) {
-			ApplyForce(body, CreateVector2(0, -50));
-		}
+		//for(ncBody* body = ncBodies; body != NULL; body = body->next) {
+		//	ApplyForce(body, CreateVector2(0, -50), FM_Force);
+		//}
 
 		// Update bodies
 		for(ncBody* body = ncBodies; body != NULL; body = body->next) {
-			ExplicitEuler(body, deltaTime);
-			ClearForce(body);
+			Step(body, deltaTime);
 		}
 
 		// Render
@@ -52,7 +58,7 @@ int main(void) {
 
 		// Render bodies
 		for(ncBody* body = ncBodies; body != NULL; body = body->next) {
-			DrawCircle((int)body->position.x, (int)body->position.y, body->mass, RED);
+			DrawCircle((int) body->position.x, (int) body->position.y, body->mass, RED);
 		}
 
 		EndDrawing();
