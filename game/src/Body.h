@@ -1,5 +1,6 @@
 #pragma once
 
+#include "raylib.h"
 #include "raymath.h"
 
 typedef enum ncBodyType {
@@ -19,6 +20,8 @@ typedef struct ncBody {
 
 	// Force -> acceleration -> velocity -> position
 	Vector2 position;
+	Vector2 prevPosition;
+	Vector2 prevPrevPosition;
 	Vector2 velocity;
 	Vector2 acceleration;
 	Vector2 force;
@@ -27,6 +30,8 @@ typedef struct ncBody {
 	float inverseMass; // static = 0
 	float gravityScale;
 	float damping;
+
+	Color color;
 
 	struct ncBody* next;
 	struct ncBody* prev;

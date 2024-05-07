@@ -1,10 +1,10 @@
 #pragma once
 
-#include "raymath.h"
+//#include "raymath.h"
 
-//#include "body.h"
+#include "body.h"
 
-typedef struct ncBody ncBody;
+//typedef struct ncBody ncBody;
 
 extern ncBody* ncBodies;
 extern int ncBodyCount;

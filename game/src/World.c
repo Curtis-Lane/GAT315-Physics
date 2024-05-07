@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "body.h"
+//#include "body.h"
 
 ncBody* ncBodies = NULL;
 int ncBodyCount = 0;
@@ -50,7 +50,7 @@ void DestroyBody(ncBody* body) {
 void DestroyAllBodies() {
 	ncBody* body = ncBodies;
 	ncBody* currentBody = NULL;
-	for(int i = 0; i < ncBodyCount; i++) {
+	while(body != NULL) {
 		currentBody = body->next;
 		DestroyBody(body);
 		body = currentBody;

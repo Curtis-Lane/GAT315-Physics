@@ -21,3 +21,8 @@ inline float GetRandomFloatValue(float min, float max) {
 inline Vector2 CreateVector2(float x, float y) {
 	return (Vector2) {x, y};
 }
+
+inline Vector2 GetVector2FromAngle(float angle) {
+	// Create a vector using cosine/sine of the angle
+	return CreateVector2(cosf(angle), sinf(angle));
+}
