@@ -4,9 +4,9 @@
 #include "raymath.h"
 
 typedef enum ncBodyType {
-	BT_Static,
+	BT_Dynamic,
 	BT_Kinematic,
-	BT_Dynamic
+	BT_Static
 } ncBodyType;
 
 typedef enum ncForceMode {
@@ -20,8 +20,9 @@ typedef struct ncBody {
 
 	// Force -> acceleration -> velocity -> position
 	Vector2 position;
-	Vector2 prevPosition;
-	Vector2 prevPrevPosition;
+	// These were here purely for trail rendering and will likely be removed.
+	//Vector2 prevPosition;
+	//Vector2 prevPrevPosition;
 	Vector2 velocity;
 	Vector2 acceleration;
 	Vector2 force;
