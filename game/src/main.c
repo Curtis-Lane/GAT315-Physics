@@ -11,6 +11,7 @@
 #include "force.h"
 #include "render.h"
 #include "editor.h"
+#include "spring.h"
 
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
@@ -19,7 +20,12 @@
 
 #define SCROLL_SENSITIVITY 0.2f
 
+#define SPRING_STIFFNESS 20.0f
+
 int main(void) {
+	ncBody* selectedBody = NULL;
+	ncBody* connectBody = NULL;
+
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Physics Engine");
 	InitEditor();
 	SetTargetFPS(60);
@@ -37,25 +43,50 @@ int main(void) {
 		ncScreenZoom = Clamp(ncScreenZoom, 0.1f, 10.0f);
 		UpdateEditor(mousePosition);
 
-		if(!ncEditorIntersect && IsMouseButtonDown(0)) {
-			// Explosions in a circle
-			for(int i = 0; i < BODIES_PER_CLICK; i++) {
-				ncBody* body = CreateBody(ConvertScreenToWorld(mousePosition), ncEditorData.massMinValue, ncEditorData.bodyTypeActive);
-				//body->mass = GetRandomFloatValue(ncEditorData.massMinValue, ncEditorData.massMaxValue);
-				body->damping = ncEditorData.dampingValue;
-				body->gravityScale = ncEditorData.gravityScaleValue;
-				body->color = ColorFromHSV(GetRandomFloatValue(0, 360), GetRandomFloat01(), GetRandomFloat01());
-				//Vector2 force = Vector2Scale(GetVector2FromAngle(GetRandomFloatValue(0, 360) * DEG2RAD), GetRandomFloatValue(1000, 2000));
-				//ApplyForce(body, force, FM_Impulse);
-			}
+		selectedBody = GetBodyIntersect(ncBodies, mousePosition);
+		if(selectedBody != NULL) {
+			Vector2 screen = ConvertWorldToScreen(selectedBody->position);
+			DrawCircleLines((int) screen.x, (int) screen.y, ConvertWorldToPixel(selectedBody->mass) * 1.1f, YELLOW);
 		}
 
+		if(!ncEditorIntersect) {
+			// Create body
+			if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+				for(int i = 0; i < BODIES_PER_CLICK; i++) {
+					ncBody* body = CreateBody(ConvertScreenToWorld(mousePosition), ncEditorData.massMinValue, ncEditorData.bodyTypeActive);
+					body->damping = ncEditorData.dampingValue;
+					body->gravityScale = ncEditorData.gravityScaleValue;
+					body->color = ColorFromHSV(GetRandomFloatValue(0, 360), GetRandomFloat01(), max(GetRandomFloat01(), 0.25f));
+				}
+			}
+
+			if(IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && selectedBody != NULL) {
+				connectBody = selectedBody;
+			}
+
+			if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && connectBody != NULL) {
+				DrawLineBodyToPosition(connectBody, mousePosition);
+			}
+
+			if(IsMouseButtonReleased(MOUSE_BUTTON_RIGHT) && connectBody != NULL) {
+				if(selectedBody != NULL && selectedBody != connectBody) {
+					ncSpring* spring = CreateSpring(selectedBody, connectBody, Vector2Distance(selectedBody->position, connectBody->position), SPRING_STIFFNESS);
+				}
+			}
+		}
+		
 		if(IsKeyPressed(KEY_R)) {
+			DestroyAllSprings();
 			DestroyAllBodies();
+		}
+
+		if(IsKeyPressed(KEY_T)) {
+			DestroyAllSprings();
 		}
 
 		// Apply force
 		ApplyGravitation(ncBodies, ncEditorData.gravitationValue);
+		ApplySpringForce(ncSprings);
 
 		// Update bodies
 		for(ncBody* body = ncBodies; body != NULL; body = body->next) {
@@ -66,17 +97,17 @@ int main(void) {
 		BeginDrawing();
 		ClearBackground(BLACK);
 
-		// Draw cursor circle
-		//if(!ncEditorIntersect) {
-		//	DrawCircle((int) mousePosition.x, (int) mousePosition.y, 15, YELLOW);
-		//}
+		// Render springs
+		for(ncSpring* spring = ncSprings; spring != NULL; spring = spring->next) {
+			Vector2 screenOne = ConvertWorldToScreen(spring->bodyOne->position);
+			Vector2 screenTwo = ConvertWorldToScreen(spring->bodyTwo->position);
+			DrawLine((int) screenOne.x, (int) screenOne.y, (int) screenTwo.x, (int) screenTwo.y, YELLOW);
+		}
 
 		// Render bodies
 		for(ncBody* body = ncBodies; body != NULL; body = body->next) {
 			Vector2 screen = ConvertWorldToScreen(body->position);
 			DrawCircle((int) screen.x, (int) screen.y, ConvertWorldToPixel(body->mass), body->color);
-			//DrawLine((int) body->prevPrevPosition.x, (int) body->prevPrevPosition.y, (int) body->prevPosition.x, (int) body->prevPosition.y, body->color);
-			//DrawLine((int) body->prevPosition.x, (int) body->prevPosition.y, (int) body->position.x, (int) body->position.y, body->color);
 		}
 
 		// Draw the editor window and related utilities.

@@ -3,6 +3,7 @@
 #define RAYGUI_IMPLEMENTATION
 #include "../../raygui/src/raygui.h"
 
+#include "render.h"
 #include "body.h"
 
 bool ncEditorActive = true;
@@ -25,7 +26,7 @@ void InitEditor() {
 
 	ncEditorData.bodyTypeEditMode = false;
 	ncEditorData.bodyTypeActive = BT_Dynamic;
-	ncEditorData.massMinValue = 0.1f;
+	ncEditorData.massMinValue = 0.5f;
 	ncEditorData.massMaxValue = 1.0f;
 	ncEditorData.gravityScaleValue = 0.0f;
 	ncEditorData.dampingValue = 0.0f;
@@ -59,10 +60,26 @@ void DrawEditor(Vector2 position) {
 		GuiSliderBar((Rectangle) {anchor01.x + 104, anchor01.y + 192, 120, 16}, "Damping", NULL, &ncEditorData.dampingValue, 0, 10);
 		GuiGroupBox((Rectangle) {anchor01.x + 16, anchor01.y + 232, 272, 152}, "World Settings");
 		GuiSliderBar((Rectangle) {anchor01.x + 128, anchor01.y + 256, 120, 16}, "Gravitation Force", NULL, &ncEditorData.gravitationValue, 0, 10);
-		if(GuiDropdownBox((Rectangle) {anchor01.x + 104, anchor01.y + 80, 120, 24}, "DYNAMIC;KINEMATIC;STATIC", &ncEditorData.bodyTypeActive, ncEditorData.bodyTypeEditMode)) ncEditorData.bodyTypeEditMode = !ncEditorData.bodyTypeEditMode;
+		if(GuiDropdownBox((Rectangle) {anchor01.x + 104, anchor01.y + 80, 120, 24}, "DYNAMIC;KINEMATIC;STATIC", (int*) &ncEditorData.bodyTypeActive, ncEditorData.bodyTypeEditMode)) ncEditorData.bodyTypeEditMode = !ncEditorData.bodyTypeEditMode;
 	}
 
 	DrawTexture(cursorTexture, (int) (position.x - cursorTexture.width * 0.5f), (int) (position.y - cursorTexture.height * 0.5f), WHITE);
 
 	GuiUnlock();
+}
+
+ncBody* GetBodyIntersect(ncBody* bodies, Vector2 position) {
+	for(ncBody* body = bodies; body != NULL; body = body->next) {
+		Vector2 screen = ConvertWorldToScreen(body->position);
+		if(CheckCollisionPointCircle(position, screen, ConvertWorldToPixel(body->mass))) {
+			return body;
+		}
+	}
+
+	return NULL;
+}
+
+void DrawLineBodyToPosition(ncBody* body, Vector2 position) {
+	Vector2 screen = ConvertWorldToScreen(body->position);
+	DrawLine((int) screen.x, (int) screen.y, (int) position.x - cursorTexture.width / 2, (int) position.y - cursorTexture.height / 2, YELLOW);
 }
