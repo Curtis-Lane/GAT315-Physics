@@ -74,7 +74,7 @@ int main(void) {
 
 			if(IsMouseButtonReleased(MOUSE_BUTTON_RIGHT) && connectBody != NULL) {
 				if(selectedBody != NULL && selectedBody != connectBody) {
-					ncSpring* spring = CreateSpring(selectedBody, connectBody, Vector2Distance(selectedBody->position, connectBody->position), SPRING_STIFFNESS);
+					ncSpring* spring = CreateSpring(selectedBody, connectBody, Vector2Distance(selectedBody->position, connectBody->position), ncEditorData.stiffnessValue);
 				}
 			}
 		}
