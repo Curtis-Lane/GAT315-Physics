@@ -1,7 +1,7 @@
 #
 # rgl layout text file (v4.0) - raygui layout file generated using rGuiLayout
 #
-# Number of controls:     10
+# Number of controls:     12
 #
 # Ref. window:    r <x> <y> <width> <height>
 # Anchor info:    a <id> <name> <posx> <posy> <enabled>
@@ -10,12 +10,14 @@
 r 0 40 -1 -1
 a 001 anchor01 776 56 1
 c 000 0 EditorWindow 0 0 304 616 1 Editor
-c 001 1 BodyGroupBox 16 48 272 168 1 Body Settings
+c 001 1 BodyGroupBox 16 48 272 192 1 Body Settings
 c 002 17 MassMinSlider 104 120 120 16 1 Mass Min
 c 003 11 BodyTypeDropdownBox 104 80 120 24 1 DYNAMIC;KINEMATIC;STATIC
 c 004 4 BodyTypeLabel 128 56 120 24 1 BODY TYPE
 c 005 17 MassMaxSlider 104 144 120 16 1 Mass Max
 c 006 17 GravityScaleSlider 104 168 120 16 1 Gravity Scale
 c 007 17 DampingSlider 104 192 120 16 1 Damping
-c 008 1 WorldGroupBox 16 232 272 152 1 World Settings
-c 009 17 GravitationForceSlider 128 256 120 16 1 Gravitation Force
+c 008 1 WorldGroupBox 16 256 272 152 1 World Settings
+c 009 16 GravitationForceSlider 128 296 120 16 1 Gravitation Force
+c 010 16 GravitySlider 128 272 120 16 1 Gravity
+c 011 17 StiffnessSlider 104 216 120 16 1 Stiffness (k)

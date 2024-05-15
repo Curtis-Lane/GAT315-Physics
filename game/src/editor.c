@@ -26,11 +26,13 @@ void InitEditor() {
 
 	ncEditorData.bodyTypeEditMode = false;
 	ncEditorData.bodyTypeActive = BT_Dynamic;
-	ncEditorData.massMinValue = 0.5f;
-	ncEditorData.massMaxValue = 1.0f;
+	ncEditorData.massMinValue = 1.5f;
+	ncEditorData.massMaxValue = 3.0f;
 	ncEditorData.gravityScaleValue = 0.0f;
 	ncEditorData.dampingValue = 0.0f;
+	ncEditorData.stiffnessValue = 20.0f;
 	ncEditorData.gravitationValue = 2.0f;
+	ncEditorData.gravityValue = 0.0f;
 
 	editorRect = (Rectangle){anchor01.x + 0, anchor01.y + 0, 304, 616};
 }
@@ -52,14 +54,16 @@ void DrawEditor(Vector2 position) {
 
 	if(EditorBoxActive) {
 		EditorBoxActive = !GuiWindowBox((Rectangle) {anchor01.x + 0, anchor01.y + 0, 304, 616}, "Editor");
-		GuiGroupBox((Rectangle) {anchor01.x + 16, anchor01.y + 48, 272, 168}, "Body Settings");
+		GuiGroupBox((Rectangle) {anchor01.x + 16, anchor01.y + 48, 272, 192}, "Body Settings");
 		GuiLabel((Rectangle) {anchor01.x + 128, anchor01.y + 56, 120, 24}, "BODY TYPE");
-		GuiSliderBar((Rectangle) {anchor01.x + 104, anchor01.y + 120, 120, 16}, "Mass Min", NULL, &ncEditorData.massMinValue, 0, 10);
-		GuiSliderBar((Rectangle) {anchor01.x + 104, anchor01.y + 144, 120, 16}, "Mass Max", NULL, &ncEditorData.massMaxValue, 0, 10);
-		GuiSliderBar((Rectangle) {anchor01.x + 104, anchor01.y + 168, 120, 16}, "Gravity Scale", NULL, &ncEditorData.gravityScaleValue, 0, 10);
-		GuiSliderBar((Rectangle) {anchor01.x + 104, anchor01.y + 192, 120, 16}, "Damping", NULL, &ncEditorData.dampingValue, 0, 10);
-		GuiGroupBox((Rectangle) {anchor01.x + 16, anchor01.y + 232, 272, 152}, "World Settings");
-		GuiSliderBar((Rectangle) {anchor01.x + 128, anchor01.y + 256, 120, 16}, "Gravitation Force", NULL, &ncEditorData.gravitationValue, 0, 10);
+		GuiSliderBar((Rectangle) {anchor01.x + 104, anchor01.y + 120, 120, 16}, "Mass Min", TextFormat("%0.2f", ncEditorData.massMinValue), &ncEditorData.massMinValue, 0, 10);
+		GuiSliderBar((Rectangle) {anchor01.x + 104, anchor01.y + 144, 120, 16}, "Mass Max", TextFormat("%0.2f", ncEditorData.massMaxValue), &ncEditorData.massMaxValue, 0, 10);
+		GuiSliderBar((Rectangle) {anchor01.x + 104, anchor01.y + 168, 120, 16}, "Gravity Scale", TextFormat("%0.2f", ncEditorData.gravityScaleValue), &ncEditorData.gravityScaleValue, 0, 10);
+		GuiSliderBar((Rectangle) {anchor01.x + 104, anchor01.y + 192, 120, 16}, "Damping", TextFormat("%0.2f", ncEditorData.dampingValue), & ncEditorData.dampingValue, 0, 10);
+		GuiSliderBar((Rectangle) {anchor01.x + 104, anchor01.y + 216, 120, 16}, "Stiffness (k)", TextFormat("%0.2f", ncEditorData.stiffnessValue), & ncEditorData.stiffnessValue, 0, 50);
+		GuiGroupBox((Rectangle) {anchor01.x + 16, anchor01.y + 256, 272, 152}, "World Settings");
+		GuiSlider((Rectangle) {anchor01.x + 128, anchor01.y + 296, 120, 16}, "Gravitation Force", TextFormat("%0.2f", ncEditorData.gravitationValue), &ncEditorData.gravitationValue, 0, 10);
+		GuiSlider((Rectangle) {anchor01.x + 128, anchor01.y + 272, 120, 16}, "Gravity", TextFormat("%0.2f", ncEditorData.gravityValue), &ncEditorData.gravityValue, -25, 25);
 		if(GuiDropdownBox((Rectangle) {anchor01.x + 104, anchor01.y + 80, 120, 24}, "DYNAMIC;KINEMATIC;STATIC", (int*) &ncEditorData.bodyTypeActive, ncEditorData.bodyTypeEditMode)) ncEditorData.bodyTypeEditMode = !ncEditorData.bodyTypeEditMode;
 	}
 
@@ -71,7 +75,7 @@ void DrawEditor(Vector2 position) {
 ncBody* GetBodyIntersect(ncBody* bodies, Vector2 position) {
 	for(ncBody* body = bodies; body != NULL; body = body->next) {
 		Vector2 screen = ConvertWorldToScreen(body->position);
-		if(CheckCollisionPointCircle(position, screen, ConvertWorldToPixel(body->mass))) {
+		if(CheckCollisionPointCircle(position, screen, ConvertWorldToPixel(body->mass * 0.5f))) {
 			return body;
 		}
 	}

@@ -12,6 +12,8 @@
 #include "render.h"
 #include "editor.h"
 #include "spring.h"
+#include "contact.h"
+#include "collision.h"
 
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
@@ -38,6 +40,8 @@ int main(void) {
 		float deltaTime = GetFrameTime();
 		float fps = (float) GetFPS();
 
+		ncGravity = CreateVector2(0.0f, ncEditorData.gravityValue);
+
 		Vector2 mousePosition = GetMousePosition();
 		ncScreenZoom -= GetMouseWheelMove() * SCROLL_SENSITIVITY;
 		ncScreenZoom = Clamp(ncScreenZoom, 0.1f, 10.0f);
@@ -46,7 +50,7 @@ int main(void) {
 		selectedBody = GetBodyIntersect(ncBodies, mousePosition);
 		if(selectedBody != NULL) {
 			Vector2 screen = ConvertWorldToScreen(selectedBody->position);
-			DrawCircleLines((int) screen.x, (int) screen.y, ConvertWorldToPixel(selectedBody->mass) * 1.1f, YELLOW);
+			DrawCircleLines((int) screen.x, (int) screen.y, ConvertWorldToPixel(selectedBody->mass * 0.5f) * 1.1f, YELLOW);
 		}
 
 		if(!ncEditorIntersect) {
@@ -56,7 +60,7 @@ int main(void) {
 					ncBody* body = CreateBody(ConvertScreenToWorld(mousePosition), ncEditorData.massMinValue, ncEditorData.bodyTypeActive);
 					body->damping = ncEditorData.dampingValue;
 					body->gravityScale = ncEditorData.gravityScaleValue;
-					body->color = ColorFromHSV(GetRandomFloatValue(0, 360), GetRandomFloat01(), max(GetRandomFloat01(), 0.25f));
+					body->color = WHITE; //ColorFromHSV(GetRandomFloatValue(0, 360), GetRandomFloat01(), max(GetRandomFloat01(), 0.5f));
 				}
 			}
 
@@ -93,6 +97,10 @@ int main(void) {
 			Step(body, deltaTime);
 		}
 
+		// Collision
+		ncContact* contacts = NULL;
+		CreateContacts(ncBodies, &contacts);
+
 		// Render
 		BeginDrawing();
 		ClearBackground(BLACK);
@@ -107,7 +115,15 @@ int main(void) {
 		// Render bodies
 		for(ncBody* body = ncBodies; body != NULL; body = body->next) {
 			Vector2 screen = ConvertWorldToScreen(body->position);
-			DrawCircle((int) screen.x, (int) screen.y, ConvertWorldToPixel(body->mass), body->color);
+			DrawCircle((int) screen.x, (int) screen.y, ConvertWorldToPixel(body->mass * 0.5f), body->color);
+		}
+
+		// Render contacts
+		for(ncContact* contact = contacts; contact != NULL; contact = contact->next) {
+			Vector2 screen = ConvertWorldToScreen(contact->bodyOne->position);
+			DrawCircle((int) screen.x, (int) screen.y, ConvertWorldToPixel(contact->bodyOne->mass * 0.5f), RED);
+			screen = ConvertWorldToScreen(contact->bodyTwo->position);
+			DrawCircle((int) screen.x, (int) screen.y, ConvertWorldToPixel(contact->bodyTwo->mass * 0.5f), RED);
 		}
 
 		// Draw the editor window and related utilities.
@@ -116,6 +132,8 @@ int main(void) {
 		// Debug Stats
 		DrawText(TextFormat("FPS: %.2f (%.2f ms)", fps, 1000 / fps), 10, 10, 20, LIME);
 		DrawText(TextFormat("FRAME: %.4f", deltaTime), 10, 30, 20, LIME);
+
+		DestroyAllContacts(&contacts);
 
 		EndDrawing();
 	}

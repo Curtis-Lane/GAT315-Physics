@@ -11,6 +11,8 @@ typedef struct ncEditorData {
 	float massMaxValue;
 	float gravityScaleValue;
 	float dampingValue;
+	float stiffnessValue;
+	float gravityValue;
 	float gravitationValue;
 } ncEditorData_t;
 
