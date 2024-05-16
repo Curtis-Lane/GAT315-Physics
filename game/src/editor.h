@@ -12,6 +12,7 @@ typedef struct ncEditorData {
 	float gravityScaleValue;
 	float dampingValue;
 	float stiffnessValue;
+	float restitutionValue;
 	float gravityValue;
 	float gravitationValue;
 } ncEditorData_t;

@@ -55,12 +55,13 @@ int main(void) {
 
 		if(!ncEditorIntersect) {
 			// Create body
-			if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && IsKeyDown(KEY_LEFT_SHIFT))) {
 				for(int i = 0; i < BODIES_PER_CLICK; i++) {
 					ncBody* body = CreateBody(ConvertScreenToWorld(mousePosition), ncEditorData.massMinValue, ncEditorData.bodyTypeActive);
 					body->damping = ncEditorData.dampingValue;
 					body->gravityScale = ncEditorData.gravityScaleValue;
 					body->color = WHITE; //ColorFromHSV(GetRandomFloatValue(0, 360), GetRandomFloat01(), max(GetRandomFloat01(), 0.5f));
+					body->restitution = ncEditorData.restitutionValue;
 				}
 			}
 
@@ -100,6 +101,8 @@ int main(void) {
 		// Collision
 		ncContact* contacts = NULL;
 		CreateContacts(ncBodies, &contacts);
+		SeparateContacts(contacts);
+		ResolveContacts(contacts);
 
 		// Render
 		BeginDrawing();

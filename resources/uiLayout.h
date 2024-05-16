@@ -43,8 +43,7 @@ typedef struct {
     float GravitationForceSliderValue;
     float GravitySliderValue;
     float StiffnessSliderValue;
-
-    Rectangle layoutRecs[12];
+    float RestitutionSliderValue;
 
     // Custom state variables (depend on development software)
     // NOTE: This variables should be added manually if required
@@ -115,19 +114,7 @@ GuiLayoutNameState InitGuiLayoutName(void)
     state.GravitationForceSliderValue = 0.0f;
     state.GravitySliderValue = 0.0f;
     state.StiffnessSliderValue = 0.0f;
-
-    state.layoutRecs[0] = (Rectangle){ state.anchor01.x + 0, state.anchor01.y + 0, 304, 616 };
-    state.layoutRecs[1] = (Rectangle){ state.anchor01.x + 16, state.anchor01.y + 48, 272, 192 };
-    state.layoutRecs[2] = (Rectangle){ state.anchor01.x + 104, state.anchor01.y + 120, 120, 16 };
-    state.layoutRecs[3] = (Rectangle){ state.anchor01.x + 104, state.anchor01.y + 80, 120, 24 };
-    state.layoutRecs[4] = (Rectangle){ state.anchor01.x + 128, state.anchor01.y + 56, 120, 24 };
-    state.layoutRecs[5] = (Rectangle){ state.anchor01.x + 104, state.anchor01.y + 144, 120, 16 };
-    state.layoutRecs[6] = (Rectangle){ state.anchor01.x + 104, state.anchor01.y + 168, 120, 16 };
-    state.layoutRecs[7] = (Rectangle){ state.anchor01.x + 104, state.anchor01.y + 192, 120, 16 };
-    state.layoutRecs[8] = (Rectangle){ state.anchor01.x + 16, state.anchor01.y + 256, 272, 152 };
-    state.layoutRecs[9] = (Rectangle){ state.anchor01.x + 128, state.anchor01.y + 296, 120, 16 };
-    state.layoutRecs[10] = (Rectangle){ state.anchor01.x + 128, state.anchor01.y + 272, 120, 16 };
-    state.layoutRecs[11] = (Rectangle){ state.anchor01.x + 104, state.anchor01.y + 216, 120, 16 };
+    state.RestitutionSliderValue = 0.0f;
 
     // Custom variables initialization
 
@@ -140,18 +127,19 @@ void GuiLayoutName(GuiLayoutNameState *state)
 
     if (state->EditorWindowActive)
     {
-        state->EditorWindowActive = !GuiWindowBox(state->layoutRecs[0], "Editor");
-        GuiGroupBox(state->layoutRecs[1], "Body Settings");
-        GuiSliderBar(state->layoutRecs[2], "Mass Min", NULL, &state->MassMinSliderValue, 0, 100);
-        GuiLabel(state->layoutRecs[4], "BODY TYPE");
-        GuiSliderBar(state->layoutRecs[5], "Mass Max", NULL, &state->MassMaxSliderValue, 0, 100);
-        GuiSliderBar(state->layoutRecs[6], "Gravity Scale", NULL, &state->GravityScaleSliderValue, 0, 100);
-        GuiSliderBar(state->layoutRecs[7], "Damping", NULL, &state->DampingSliderValue, 0, 100);
-        GuiGroupBox(state->layoutRecs[8], "World Settings");
-        GuiSlider(state->layoutRecs[9], "Gravitation Force", NULL, &state->GravitationForceSliderValue, 0, 100);
-        GuiSlider(state->layoutRecs[10], "Gravity", NULL, &state->GravitySliderValue, 0, 100);
-        GuiSliderBar(state->layoutRecs[11], "Stiffness (k)", NULL, &state->StiffnessSliderValue, 0, 100);
-        if (GuiDropdownBox(state->layoutRecs[3], "DYNAMIC;KINEMATIC;STATIC", &state->BodyTypeDropdownBoxActive, state->BodyTypeDropdownBoxEditMode)) state->BodyTypeDropdownBoxEditMode = !state->BodyTypeDropdownBoxEditMode;
+        state->EditorWindowActive = !GuiWindowBox((Rectangle){ state->anchor01.x + 0, state->anchor01.y + 0, 304, 616 }, "Editor");
+        GuiGroupBox((Rectangle){ state->anchor01.x + 16, state->anchor01.y + 48, 272, 216 }, "Body Settings");
+        GuiSliderBar((Rectangle){ state->anchor01.x + 104, state->anchor01.y + 120, 120, 16 }, "Mass Min", NULL, &state->MassMinSliderValue, 0, 100);
+        GuiLabel((Rectangle){ state->anchor01.x + 128, state->anchor01.y + 56, 120, 24 }, "BODY TYPE");
+        GuiSliderBar((Rectangle){ state->anchor01.x + 104, state->anchor01.y + 144, 120, 16 }, "Mass Max", NULL, &state->MassMaxSliderValue, 0, 100);
+        GuiSliderBar((Rectangle){ state->anchor01.x + 104, state->anchor01.y + 168, 120, 16 }, "Gravity Scale", NULL, &state->GravityScaleSliderValue, 0, 100);
+        GuiSliderBar((Rectangle){ state->anchor01.x + 104, state->anchor01.y + 192, 120, 16 }, "Damping", NULL, &state->DampingSliderValue, 0, 100);
+        GuiGroupBox((Rectangle){ state->anchor01.x + 16, state->anchor01.y + 280, 272, 152 }, "World Settings");
+        GuiSlider((Rectangle){ state->anchor01.x + 128, state->anchor01.y + 312, 120, 16 }, "Gravitation Force", NULL, &state->GravitationForceSliderValue, 0, 100);
+        GuiSlider((Rectangle){ state->anchor01.x + 128, state->anchor01.y + 288, 120, 16 }, "Gravity", NULL, &state->GravitySliderValue, 0, 100);
+        GuiSliderBar((Rectangle){ state->anchor01.x + 104, state->anchor01.y + 216, 120, 16 }, "Stiffness (k)", NULL, &state->StiffnessSliderValue, 0, 100);
+        GuiSliderBar((Rectangle){ state->anchor01.x + 104, state->anchor01.y + 240, 120, 16 }, "Restitution", NULL, &state->RestitutionSliderValue, 0, 100);
+        if (GuiDropdownBox((Rectangle){ state->anchor01.x + 104, state->anchor01.y + 80, 120, 24 }, "DYNAMIC;KINEMATIC;STATIC", &state->BodyTypeDropdownBoxActive, state->BodyTypeDropdownBoxEditMode)) state->BodyTypeDropdownBoxEditMode = !state->BodyTypeDropdownBoxEditMode;
     }
     
     GuiUnlock();

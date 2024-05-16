@@ -15,7 +15,7 @@ void ApplyForce(ncBody* body, Vector2 force, ncForceMode forceMode) {
 			break;
 		case FM_Impulse:
 			// Applies a sudden change in momentum
-			body->velocity = Vector2Scale(force, body->inverseMass);
+			body->velocity = Vector2Add(body->velocity, Vector2Scale(force, body->inverseMass));
 
 			break;
 		case FM_Velocity:
@@ -29,8 +29,6 @@ void Step(ncBody* body, float timestep) {
 	body->force = Vector2Add(body->force, Vector2Scale(Vector2Scale(ncGravity, body->gravityScale), body->mass));
 	body->acceleration = Vector2Scale(body->force, body->inverseMass);
 
-	//body->prevPrevPosition = body->prevPosition;
-	//body->prevPosition = body->position;
 	SemiImplicitEuler(body, timestep);
 
 	// Damping
