@@ -65,7 +65,7 @@ void DrawEditor(Vector2 position) {
 		GuiSliderBar((Rectangle) {anchor01.x + 104, anchor01.y + 240, 120, 16}, "Restitution", TextFormat("%0.2f", ncEditorData.restitutionValue), &ncEditorData.restitutionValue, 0, 2.5f);
 		GuiGroupBox((Rectangle) {anchor01.x + 16, anchor01.y + 280, 272, 152}, "World Settings");
 		GuiSlider((Rectangle) {anchor01.x + 128, anchor01.y + 288, 120, 16}, "Gravity", TextFormat("%0.2f", ncEditorData.gravityValue), &ncEditorData.gravityValue, -25, 25);
-		GuiSlider((Rectangle) {anchor01.x + 128, anchor01.y + 312, 120, 16}, "Gravitation Force", TextFormat("%0.2f", ncEditorData.gravitationValue), &ncEditorData.gravitationValue, 0, 10);
+		GuiSlider((Rectangle) {anchor01.x + 128, anchor01.y + 312, 120, 16}, "Gravitation Force", TextFormat("%0.2f", ncEditorData.gravitationValue), &ncEditorData.gravitationValue, -10, 10);
 		if(GuiDropdownBox((Rectangle) {anchor01.x + 104, anchor01.y + 80, 120, 24}, "DYNAMIC;KINEMATIC;STATIC", (int*) &ncEditorData.bodyTypeActive, ncEditorData.bodyTypeEditMode)) ncEditorData.bodyTypeEditMode = !ncEditorData.bodyTypeEditMode;
 	}
 

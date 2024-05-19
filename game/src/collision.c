@@ -88,19 +88,27 @@ void SeparateContacts(ncContact* contacts) {
 	}
 }
 
-// TODO: Add Comments
 void ResolveContacts(ncContact* contacts) {
+	// Iterate over every contact that was provided
 	for(ncContact* contact = contacts; contact != NULL; contact = contact->next) {
+		// Calculate the relative velocity between the two bodies
 		Vector2 relativeVelocity = Vector2Subtract(contact->bodyOne->velocity, contact->bodyTwo->velocity);
+		// Calculate the normal velocity of the collision
 		float normalVelocity = Vector2DotProduct(relativeVelocity, contact->normal);
+		// If the bodies are moving in the same direction, skip further calculations for current collision
 		if(normalVelocity > 0.0f) {
 			continue;
 		}
 
+		// Calculate the combined inverse mass of both of the contact's bodies
 		float totalInvMass = contact->bodyOne->inverseMass + contact->bodyTwo->inverseMass;
+		// Calculate the impulse magnitude using the restitution coefficient and the relative velocity
 		float impulseMagnitude = (((1.0f + contact->restitution) * -1) * normalVelocity / totalInvMass);
+		// Convert that impluse magnitude into a vector by scaling the contact's normal by the impulse magnitude
 		Vector2 impulseVector = Vector2Scale(contact->normal, impulseMagnitude);
 
+		// Apply the impulse force to both bodies
+		// The second body has the force inverted so that the two bodies move in opposite directions
 		ApplyForce(contact->bodyOne, impulseVector, FM_Impulse);
 		ApplyForce(contact->bodyTwo, Vector2Negate(impulseVector), FM_Impulse);
 	}
