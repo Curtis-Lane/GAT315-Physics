@@ -22,15 +22,19 @@
 
 #define SCROLL_SENSITIVITY 0.2f
 
-#define SPRING_STIFFNESS 20.0f
+#define PHYSICS_RATE 50
 
 int main(void) {
 	ncBody* selectedBody = NULL;
 	ncBody* connectBody = NULL;
+	ncContact* contacts = NULL;
 
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Physics Engine");
 	InitEditor();
 	SetTargetFPS(60);
+
+	float fixedTimestep = 1.0f / PHYSICS_RATE;
+	float timeAccumulator = 0.0f;
 
 	// Initialize world
 	ncGravity = CreateVector2(0, -1);
@@ -39,6 +43,7 @@ int main(void) {
 		// Update
 		float deltaTime = GetFrameTime();
 		float fps = (float) GetFPS();
+		timeAccumulator += deltaTime;
 
 		ncGravity = CreateVector2(0.0f, ncEditorData.gravityValue);
 
@@ -89,20 +94,25 @@ int main(void) {
 			DestroyAllSprings();
 		}
 
-		// Apply force
-		ApplyGravitation(ncBodies, ncEditorData.gravitationValue);
-		ApplySpringForce(ncSprings);
+		while(timeAccumulator >= fixedTimestep) {
+			timeAccumulator -= fixedTimestep;
 
-		// Update bodies
-		for(ncBody* body = ncBodies; body != NULL; body = body->next) {
-			Step(body, deltaTime);
+			// Apply forces
+			ApplyGravitation(ncBodies, ncEditorData.gravitationValue);
+			ApplySpringForce(ncSprings);
+
+			// Update bodies
+			for(ncBody* body = ncBodies; body != NULL; body = body->next) {
+				Step(body, fixedTimestep);
+			}
+
+			DestroyAllContacts(&contacts);
+
+			// Collision
+			CreateContacts(ncBodies, &contacts);
+			SeparateContacts(contacts);
+			ResolveContacts(contacts);
 		}
-
-		// Collision
-		ncContact* contacts = NULL;
-		CreateContacts(ncBodies, &contacts);
-		SeparateContacts(contacts);
-		ResolveContacts(contacts);
 
 		// Render
 		BeginDrawing();
@@ -135,8 +145,6 @@ int main(void) {
 		// Debug Stats
 		DrawText(TextFormat("FPS: %.2f (%.2f ms)", fps, 1000 / fps), 10, 10, 20, LIME);
 		DrawText(TextFormat("FRAME: %.4f", deltaTime), 10, 30, 20, LIME);
-
-		DestroyAllContacts(&contacts);
 
 		EndDrawing();
 	}
