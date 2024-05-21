@@ -7,14 +7,15 @@ typedef enum ncBodyType ncBodyType;
 typedef struct ncEditorData {
 	bool bodyTypeEditMode;
 	ncBodyType bodyTypeActive;
-	float massMinValue;
-	float massMaxValue;
+	float massValue;
 	float gravityScaleValue;
 	float dampingValue;
 	float stiffnessValue;
 	float restitutionValue;
 	float gravityValue;
 	float gravitationValue;
+	float timestepValue; // Maybe should be int?
+	bool simulationToggleActive;
 } ncEditorData_t;
 
 extern ncEditorData_t ncEditorData;

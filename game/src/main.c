@@ -22,8 +22,6 @@
 
 #define SCROLL_SENSITIVITY 0.2f
 
-#define PHYSICS_RATE 50
-
 int main(void) {
 	ncBody* selectedBody = NULL;
 	ncBody* connectBody = NULL;
@@ -33,7 +31,6 @@ int main(void) {
 	InitEditor();
 	SetTargetFPS(60);
 
-	float fixedTimestep = 1.0f / PHYSICS_RATE;
 	float timeAccumulator = 0.0f;
 
 	// Initialize world
@@ -44,6 +41,7 @@ int main(void) {
 		float deltaTime = GetFrameTime();
 		float fps = (float) GetFPS();
 		timeAccumulator += deltaTime;
+		float fixedTimestep = 1.0f / ncEditorData.timestepValue;
 
 		ncGravity = CreateVector2(0.0f, ncEditorData.gravityValue);
 
@@ -62,11 +60,13 @@ int main(void) {
 			// Create body
 			if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && IsKeyDown(KEY_LEFT_SHIFT))) {
 				for(int i = 0; i < BODIES_PER_CLICK; i++) {
-					ncBody* body = CreateBody(ConvertScreenToWorld(mousePosition), ncEditorData.massMinValue, ncEditorData.bodyTypeActive);
+					ncBody* body = CreateBody(ConvertScreenToWorld(mousePosition), ncEditorData.massValue, ncEditorData.bodyTypeActive);
 					body->damping = ncEditorData.dampingValue;
 					body->gravityScale = ncEditorData.gravityScaleValue;
 					body->color = WHITE; //ColorFromHSV(GetRandomFloatValue(0, 360), GetRandomFloat01(), max(GetRandomFloat01(), 0.5f));
 					body->restitution = ncEditorData.restitutionValue;
+
+					AddBody(body);
 				}
 			}
 
@@ -81,10 +81,23 @@ int main(void) {
 			if(IsMouseButtonReleased(MOUSE_BUTTON_RIGHT) && connectBody != NULL) {
 				if(selectedBody != NULL && selectedBody != connectBody) {
 					ncSpring* spring = CreateSpring(selectedBody, connectBody, Vector2Distance(selectedBody->position, connectBody->position), ncEditorData.stiffnessValue);
+					AddSpring(spring);
 				}
 			}
+
+			if(IsKeyDown(KEY_LEFT_SHIFT)) {
+				if(connectBody != NULL) {
+					Vector2 world = ConvertScreenToWorld(mousePosition);
+					ApplySpringForcePosition(world, connectBody, 0, 20, 5);
+				}
+			}
+
+			if(IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
+				selectedBody = NULL;
+				connectBody = NULL;
+			}
 		}
-		
+
 		if(IsKeyPressed(KEY_R)) {
 			DestroyAllSprings();
 			DestroyAllBodies();
@@ -94,8 +107,16 @@ int main(void) {
 			DestroyAllSprings();
 		}
 
+		if(IsKeyPressed(KEY_P)) {
+			ncEditorData.simulationToggleActive = !ncEditorData.simulationToggleActive;
+		}
+
 		while(timeAccumulator >= fixedTimestep) {
 			timeAccumulator -= fixedTimestep;
+
+			if(!ncEditorData.simulationToggleActive) {
+				continue;
+			}
 
 			// Apply forces
 			ApplyGravitation(ncBodies, ncEditorData.gravitationValue);

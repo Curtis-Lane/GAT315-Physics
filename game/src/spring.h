@@ -20,3 +20,4 @@ extern void DestroySpring(ncSpring* spring);
 extern void DestroyAllSprings();
 
 extern void ApplySpringForce(ncSpring* springs);
+extern void ApplySpringForcePosition(Vector2 position, ncBody* body, float restLength, float k, float damping);

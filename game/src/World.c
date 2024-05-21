@@ -20,8 +20,6 @@ ncBody* CreateBody(Vector2 position, float mass, ncBodyType bodyType) {
 	body->inverseMass = (bodyType == BT_Dynamic) ? (1 / mass) : 0.0f;
 	body->bodyType = bodyType;
 
-	AddBody(body);
-
 	return body;
 }
 
