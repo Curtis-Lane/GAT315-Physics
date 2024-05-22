@@ -88,7 +88,12 @@ int main(void) {
 			if(IsKeyDown(KEY_LEFT_SHIFT)) {
 				if(connectBody != NULL) {
 					Vector2 world = ConvertScreenToWorld(mousePosition);
-					ApplySpringForcePosition(world, connectBody, 0, 20, 5);
+
+					if(connectBody->bodyType != BT_Dynamic) {
+						connectBody->position = world;
+					} else {
+						ApplySpringForcePosition(world, connectBody, 0, 20, 5);
+					}
 				}
 			}
 
@@ -98,7 +103,7 @@ int main(void) {
 			}
 		}
 
-		if(IsKeyPressed(KEY_R)) {
+		if(IsKeyPressed(KEY_R) || ncEditorData.isResetPressed) {
 			DestroyAllSprings();
 			DestroyAllBodies();
 		}

@@ -15,6 +15,7 @@ typedef struct ncEditorData {
 	float gravityValue;
 	float gravitationValue;
 	float timestepValue; // Maybe should be int?
+	bool isResetPressed;
 	bool simulationToggleActive;
 } ncEditorData_t;
 

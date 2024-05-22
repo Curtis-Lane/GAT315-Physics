@@ -64,4 +64,5 @@ void DestroyAllBodies() {
 		DestroyBody(body);
 		body = currentBody;
 	}
+	ncBodies = NULL;
 }

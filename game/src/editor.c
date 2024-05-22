@@ -4,8 +4,7 @@
 #include "../../raygui/src/raygui.h"
 
 #include "render.h"
-#include "world.h"
-#include "spring.h"
+#include "body.h"
 
 #define EDITOR_DATA_FLOAT(data) TextFormat("%0.2f", data), &data
 
@@ -30,21 +29,17 @@ void InitEditor() {
 	ncEditorData.bodyTypeEditMode = false;
 	ncEditorData.bodyTypeActive = BT_Dynamic;
 	ncEditorData.massValue = 1.5f;
-	ncEditorData.gravityScaleValue = 0.0f;
+	ncEditorData.gravityScaleValue = 1.0f;
 	ncEditorData.dampingValue = 0.0f;
 	ncEditorData.stiffnessValue = 20.0f;
 	ncEditorData.restitutionValue = 0.5f;
 	ncEditorData.gravitationValue = 2.0f;
 	ncEditorData.gravityValue = 0.0f;
 	ncEditorData.timestepValue = 50.0f;
+	ncEditorData.isResetPressed = false;
 	ncEditorData.simulationToggleActive = true;
 
 	editorRect = (Rectangle){anchor01.x + 0, anchor01.y + 0, 304, 432};
-}
-
-static void ResetButton() {
-	DestroyAllSprings();
-	DestroyAllBodies();
 }
 
 void UpdateEditor(Vector2 position) {
@@ -75,7 +70,7 @@ void DrawEditor(Vector2 position) {
 		GuiSlider((Rectangle) {anchor01.x + 128, anchor01.y + 288, 120, 16}, "Gravity", EDITOR_DATA_FLOAT(ncEditorData.gravityValue), -25, 25);
 		GuiSlider((Rectangle) {anchor01.x + 128, anchor01.y + 312, 120, 16}, "Gravitation Force", EDITOR_DATA_FLOAT(ncEditorData.gravitationValue), -10, 10);
 		GuiSliderBar((Rectangle) {anchor01.x + 128, anchor01.y + 336, 120, 16}, "Timestep", EDITOR_DATA_FLOAT(ncEditorData.timestepValue), 0, 120);
-		if(GuiButton((Rectangle) {anchor01.x + 16, anchor01.y + 392, 120, 24}, "Reset")) ResetButton();
+		ncEditorData.isResetPressed = GuiButton((Rectangle) {anchor01.x + 16, anchor01.y + 392, 120, 24}, "Reset");
 		GuiToggle((Rectangle) {anchor01.x + 176, anchor01.y + 392, 112, 24}, "Simulate", &ncEditorData.simulationToggleActive);
 		if(GuiDropdownBox((Rectangle) {anchor01.x + 104, anchor01.y + 80, 120, 24}, "DYNAMIC;KINEMATIC;STATIC", (int*) &ncEditorData.bodyTypeActive, ncEditorData.bodyTypeEditMode)) ncEditorData.bodyTypeEditMode = !ncEditorData.bodyTypeEditMode;
 	}
